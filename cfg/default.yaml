@@ -1,0 +1,21 @@
+dataset:
+  in_channels: 1
+  num_classes: 10
+
+exp:
+  exp_dir: './run'
+  exp_name: 'default'
+  device: 'cuda:0'
+
+train:
+  batch_size: 100
+  shuffle: True
+  num_workers: 0
+  learning rate: 0.001
+  max_epoch: 5
+  loss_display_freq: 100
+  val_epoch_freq: 5
+
+val:
+  batch_size: 100
+  num_workers: 0
