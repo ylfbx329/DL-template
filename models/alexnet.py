@@ -30,6 +30,7 @@ class AlexNet(nn.Module):
             nn.ReLU(inplace=True),
             nn.Linear(2048, num_classes)
         )
+        self.init_weights()
 
     def forward(self, x):
         x = self.features(x)
@@ -37,6 +38,13 @@ class AlexNet(nn.Module):
         x = torch.flatten(x, 1)
         x = self.classifier(x)
         return x
+
+    def init_weights(self):
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):
+                nn.init.xavier_uniform_(m.weight)
+                if m.bias is not None:
+                    nn.init.zeros_(m.bias)
 
 
 if __name__ == '__main__':
