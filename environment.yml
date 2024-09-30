@@ -1,0 +1,12 @@
+name: dl
+channels:
+  - defaults
+  - pytorch
+  - nvidia
+dependencies:
+  - python=3.10
+  - pytorch
+  - torchvision
+  - pytorch-cuda=12.1
+  - conda-forge::matplotlib
+  - conda-forge::tqdm

@@ -1,0 +1,20 @@
+exp_name: 'default'
+
+data:
+  root: '/DL-template/data/raw'
+
+model:
+  in_channels: 1
+  num_classes: 10
+
+train:
+  device: 'cuda:0'
+  epochs: 10
+  batch_size: 32
+  learning_rate: 0.001
+  optimizer: 'Adam'
+
+eval:
+  device: 'cuda:0'
+  resume: '/checkpoints/epoch.pth'
+  batch_size: 1
