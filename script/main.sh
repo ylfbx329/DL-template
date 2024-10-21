@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # 声明环境变量
-PROJECT_ROOT="/home/username/DL-template"
+PROJECT_ROOT="/home/username/DL-template" # 替换为实际项目根目录
 export PROJECT_ROOT
 export PYTHONPATH=$PROJECT_ROOT:$PYTHONPATH
 

@@ -5,8 +5,8 @@ import torch
 from tqdm import tqdm
 
 from src.data.data_loader import get_data_loader
-from src.models.create_model import create_model
-from src.criterion.create_loss import create_criterion
+from src.models.net import create_model
+from src.criterion.criterion import create_criterion
 from src.utils.utils import read_cfg, get_transform
 
 

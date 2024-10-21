@@ -5,9 +5,9 @@ import torch
 
 from src.data.data_loader import get_data_loader
 from src.train.trainer import train_one_epoch
-from src.models.create_model import create_model
-from src.criterion.create_loss import create_criterion
-from src.optim.create_optimizer import create_optimizer
+from src.models.net import create_model
+from src.criterion.criterion import create_criterion
+from src.optim.optim import create_optimizer
 from src.utils.utils import read_cfg, get_ckpt_path, save_ckpt, get_transform, get_res_path
 
 
