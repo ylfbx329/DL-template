@@ -25,7 +25,7 @@
 
 ## 项目目录
 
-```  
+```
 DL-template                # 项目根目录
 ├── configs                # 配置文件夹
 │   └── default.yaml       # 默认配置文件
@@ -53,7 +53,6 @@ DL-template                # 项目根目录
 ├── script                 # shell脚本文件夹
 │   └── main.sh            # 主脚本（项目入口）
 ├── test                   # 测试文件夹
-│   └── tmp.py
 ├── outputs                # 实验结果输出文件夹
 │   └── <exp_name>
 │       ├── checkpoints
