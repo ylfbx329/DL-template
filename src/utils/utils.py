@@ -3,11 +3,13 @@ import yaml
 import torch
 from torchvision.transforms import v2
 
+from src.config.config import Config
+
 
 def read_cfg(cfg_path):
     """
-    读取配置文件，返回字典
-    :param cfg_path:
+    读取YAML格式的配置文件，返回字典
+    :param cfg_path: 配置文件完整路径
     :return: 参数字典:
     """
     with open(cfg_path, 'r') as file:
@@ -15,52 +17,28 @@ def read_cfg(cfg_path):
     return cfg
 
 
-def get_exp_path(exp_name):
+def get_exp_path():
     """
-    获取实验输出目录
-    :param exp_name:
+    获取实验输出目录的绝对路径
     :return:
     """
     # 拼装实验输出目录
-    exp_path = os.path.join(os.environ['PROJECT_ROOT'], 'outputs', exp_name)
-
+    exp_path = os.path.join(Config.args.proj_root, 'outputs', Config.args.exp_name)
     return exp_path
 
 
-def get_ckpt_path(exp_name, ckpt_name):
+def get_output_path(filename, type):
     """
-    获取检查点保存路径
-    :param exp_name:本次实验名称，用以区分各次实验
-    :param ckpt_name:检查点文件名
-    :return: 完整的检查点保存路径
+    获取输出文件的绝对路径
+    :param filename: 输出文件的完整文件名
+    :param type: 输出文件类型，必须是['checkpoint', 'log', 'result']其中之一
+    :return:
     """
-    # 拼装checkpoint保存目录
-    ckpt_dir = os.path.join(get_exp_path(exp_name), 'checkpoints')
-
-    # 确保目录存在，如果不存在则创建
-    os.makedirs(ckpt_dir, exist_ok=True)
-
-    # 拼装checkpoint路径
-    ckpt_path = os.path.join(ckpt_dir, f'{ckpt_name}.pth')
-    return ckpt_path
-
-
-def get_res_path(exp_name, result_file_name):
-    """
-    获取结果文件保存路径
-    :param exp_name:本次实验名称，用以区分各次实验
-    :param result_file_name:结果文件名
-    :return: 完整的结果文件保存路径
-    """
-    # 拼装结果文件保存目录
-    res_dir = os.path.join(get_exp_path(exp_name), 'results')
-
-    # 确保目录存在，如果不存在则创建
-    os.makedirs(res_dir, exist_ok=True)
-
-    # 拼装结果文件路径
-    res_path = os.path.join(res_dir, result_file_name)
-    return res_path
+    if type not in ['checkpoint', 'log', 'result']:
+        raise ValueError(f'type must be "checkpoints" or "logs" or "results", but got {type}')
+    path = os.path.join(get_exp_path(), type, filename)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    return path
 
 
 def get_transform():

@@ -1,9 +1,12 @@
 import torch
 import torch.nn as nn
 
+from src.config.config import Config
+from src.utils.utils import get_output_path
+
 
 class Net(nn.Module):
-    def __init__(self, param):
+    def __init__(self):
         super(Net, self).__init__()
         pass
         self.initialize_weights()
@@ -15,13 +18,15 @@ class Net(nn.Module):
     def initialize_weights(self):
         pass
 
-def create_model(param, resume=None):
+
+def create_model(resume=False):
     """
-    返回初始化模型
+    创建模型，选择性加载模型权重
     :return:
     """
-    net = Net(param)
-    if resume is not None:
-        checkpoint = torch.load(resume)
+    net = Net()
+    if resume:
+        ckpt = get_output_path(filename=Config.args.eval.resume, type='checkpoint')
+        checkpoint = torch.load(ckpt)
         net.load_state_dict(checkpoint['model_state_dict'])
     return net

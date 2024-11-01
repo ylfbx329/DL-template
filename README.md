@@ -7,20 +7,22 @@
 - [ ] 将训练和验证日志保存为文件
 - [x] 模型验证
 - [ ] 训练可视化（TensorBoard、Visdom、**WandB**）
+- [x] 项目空目录追踪
 
 ## 使用指南
 
 1. 安装依赖环境
    ```shell
-   conda env create -f ./environment.yml
+   conda env create -f environment.yml
    ```
-2. 参考`configs/default.yaml`，根据项目需要，在`configs`下创建配置文件（e.g., `configs/exp.yaml`）
-3. 修改`script/main.sh`内容
-    - 将变量`PROJECT_ROOT`设置为项目根目录（e.g., `/home/username/DL-template`）
-    - 将变量`CONFIG_FILE`设置为使用的配置文件（e.g., `$PROJECT_ROOT/configs/default.yaml`）
-4. 运行`script/main.sh`
+2. 参考`configs/default.yaml`，根据项目需要，在`configs`下创建自己的配置文件
+3. 训练模型，运行`src/train/train.py`脚本
    ```shell
-   bash script/main.sh
+   python -m src.train.train ./configs/<your-config>.yaml
+   ```
+4. 预测模型，运行`src/evaluate/evaluate.py`脚本
+   ```shell
+   python -m src.evaluate.evaluate ./configs/<your-config>.yaml
    ```
 
 ## 项目目录
@@ -33,7 +35,10 @@ DL-template                # 项目根目录
 │   ├── raw                # 原始数据
 │   └── processed          # 处理后数据
 ├── notebooks              # Jupyter文件夹
+├── projects               # 相关项目文件夹
 ├── src                    # 源代码文件夹
+│   ├── config             # 全局配置
+│   │   └── config.py
 │   ├── data               # 数据
 │   │   ├── dataset.py     # 数据集
 │   │   └── data_loader.py # 数据加载器
@@ -50,14 +55,12 @@ DL-template                # 项目根目录
 │   │   └── evaluate.py
 │   └── utils              # 工具文件夹
 │       └── utils.py
-├── script                 # shell脚本文件夹
-│   └── main.sh            # 主脚本（项目入口）
 ├── test                   # 测试文件夹
 ├── outputs                # 实验结果输出文件夹
 │   └── <exp_name>
-│       ├── checkpoints
-│       ├── logs
-│       └── results
+│       ├── checkpoint
+│       ├── log
+│       └── result
 ├── environment.yml        # conda环境描述文件
 └── README.md
 ```
