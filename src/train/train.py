@@ -1,6 +1,6 @@
-import argparse
 import matplotlib.pyplot as plt
 import torch
+import wandb
 
 from src.config.config import Config
 from src.data.data_loader import get_data_loader
@@ -8,7 +8,7 @@ from src.train.trainer import train_one_epoch
 from src.models.net import create_model
 from src.criterion.criterion import create_criterion
 from src.optim.optim import create_optimizer
-from src.utils.utils import read_cfg, save_ckpt, get_transform, get_output_path
+from src.utils.utils import save_ckpt, get_transform, get_output_path
 
 
 def train():
@@ -24,7 +24,7 @@ def train():
     train_param = Config.args.train
 
     # 训练设备设置
-    device = torch.device(train_param.device)
+    device = torch.device(Config.args.device)
 
     # 定义数据变换操作
     transform = get_transform()
@@ -33,7 +33,7 @@ def train():
     train_loader = get_data_loader(data_param.root, train_param.batch_size, split='train', transform=transform)
 
     # 初始化模型、损失函数和优化器
-    model = create_model(resume=True)
+    model = create_model()
     criterion = create_criterion()
     optimizer = create_optimizer(model, train_param.lr)
 
@@ -62,6 +62,8 @@ def train():
 
         # 信息输出，可自定义
         print(f'Epoch [{epoch}/{total_epochs}]: Loss: {epoch_loss}')
+        if Config.args.use_wandb:
+            wandb.log({"loss": epoch_loss})
 
     # epoch-loss图像，可自定义
     plt.plot(epoch_losses)
@@ -71,25 +73,3 @@ def train():
     plt.savefig(get_output_path(filename='loss.png', type='result'))
     plt.show()
     print('End train!')
-
-
-if __name__ == '__main__':
-    # 设置命令行参数
-    parser = argparse.ArgumentParser()
-    parser.add_argument('cfg', help='path to config file')  # 必要参数
-    # 在此添加更多命令行参数
-
-    # 转为参数字典
-    args = parser.parse_args()
-
-    # 读取配置文件
-    cfg = read_cfg(args.cfg)
-
-    # 解析配置参数
-    Config.update_args([vars(args), cfg])
-
-    # 整齐打印参数
-    Config.print_args()
-
-    # 模型训练
-    train()

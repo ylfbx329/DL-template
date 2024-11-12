@@ -6,8 +6,10 @@
 
 - [ ] 将训练和验证日志保存为文件
 - [x] 模型验证
-- [ ] 训练可视化（TensorBoard、Visdom、**WandB**）
+- [x] 训练可视化（TensorBoard、Visdom、**WandB**）
+    - [ ] Rethink WandB功能
 - [x] 项目空目录追踪
+- [ ] 多卡训练支持
 
 ## 使用指南
 
@@ -15,14 +17,18 @@
    ```shell
    conda env create -f environment.yml
    ```
-2. 参考`configs/default.yaml`，根据项目需要，在`configs`下创建自己的配置文件
-3. 训练模型，运行`src/train/train.py`脚本
+   【可选】根据`environment.yml`更新依赖环境，`--prune`选项使conda从环境中删除不再需要的任何依赖项
    ```shell
-   python -m src.train.train ./configs/<your-config>.yaml
+   conda env update --file environment.yml --prune
    ```
-4. 预测模型，运行`src/evaluate/evaluate.py`脚本
+2. 参考`configs/default.yaml`，根据项目需要，在`configs`下创建自己的配置文件
+3. 训练模型，运行`src/main.py`脚本
    ```shell
-   python -m src.evaluate.evaluate ./configs/<your-config>.yaml
+   python -m src.main ./configs/<your-config>.yaml --is_train
+   ```
+4. 预测模型，运行`src/main.py`脚本
+   ```shell
+   python -m src.main ./configs/<your-config>.yaml --is_eval
    ```
 
 ## 项目目录

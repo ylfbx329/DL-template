@@ -1,5 +1,6 @@
 import os
 import yaml
+import wandb
 import torch
 from torchvision.transforms import v2
 
@@ -17,14 +18,28 @@ def read_cfg(cfg_path):
     return cfg
 
 
-def get_exp_path():
+def wandb_init():
+    wandb.login()
+
+    project = os.path.basename(Config.args.proj_root)
+    argsdict = Config.get_argsdict(Config.args)
+    exp_path = get_exp_path()
+    wandb.init(
+        project=project,
+        name=Config.args.exp_name,
+        config=argsdict,
+        dir=exp_path
+    )
+
+
+def get_exp_path() -> str:
     """
     获取实验输出目录的绝对路径
     :return:
     """
     # 拼装实验输出目录
     exp_path = os.path.join(Config.args.proj_root, 'outputs', Config.args.exp_name)
-    return exp_path
+    return str(exp_path)
 
 
 def get_output_path(filename, type):

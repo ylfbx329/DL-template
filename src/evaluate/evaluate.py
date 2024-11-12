@@ -1,13 +1,13 @@
-import argparse
 import numpy as np
 import torch
+import wandb
 from tqdm import tqdm
 
 from src.config.config import Config
 from src.data.data_loader import get_data_loader
 from src.models.net import create_model
 from src.criterion.criterion import create_criterion
-from src.utils.utils import read_cfg, get_transform, get_output_path
+from src.utils.utils import get_transform, get_output_path
 
 
 @torch.no_grad()
@@ -18,12 +18,11 @@ def evaluate():
     """
     print('Start evaluate...')
     # 参数设置
-    data_param = Config.args.dara
-    model_param = Config.args.model
+    data_param = Config.args.data
     eval_param = Config.args.eval
 
     # 评估设备设置
-    device = torch.device(eval_param.device)
+    device = torch.device(Config.args.device)
 
     # 定义数据变换操作
     transform = get_transform()
@@ -45,10 +44,13 @@ def evaluate():
     loss_history = []
 
     # 正确case计数
-    acc = 0
+    acc_sum = 0
 
     # 结果保存
     results = []
+
+    if Config.args.use_wandb:
+        table = wandb.Table(columns=["accuracy", "loss"])
 
     # 测试模型，遍历数据集，显示进度条
     total_batch = len(test_loader)  # 便于调用
@@ -67,7 +69,9 @@ def evaluate():
         result = torch.argmax(outputs, dim=1)
 
         # 正确case计数
-        acc += (result == labels).sum().item()
+        acc = (result == labels).sum().item()
+
+        acc_sum += acc
 
         # 记录loss
         loss_history.append(loss.item())
@@ -75,8 +79,14 @@ def evaluate():
         # 结果保存
         results.append(result.cpu().numpy())
 
+        if Config.args.use_wandb:
+            table.add_data(acc, loss)
+
+    if Config.args.use_wandb:
+        wandb.log({"table_key": table})
+
     # 计算正确率
-    acc_rate = acc / len(test_loader.dataset)
+    acc_rate = acc_sum / len(test_loader.dataset)
 
     # 计算平均loss
     eval_loss = np.mean(loss_history)
@@ -90,25 +100,3 @@ def evaluate():
     print(f'Evaluate: Accuracy={acc_rate}: Loss: {eval_loss}')
 
     print('End evaluate!')
-
-
-if __name__ == '__main__':
-    # 设置命令行参数
-    parser = argparse.ArgumentParser()
-    parser.add_argument('cfg', help='path to config file')  # 必要参数
-    # 在此添加更多命令行参数
-
-    # 转为参数字典
-    args = parser.parse_args()
-
-    # 读取配置文件
-    cfg = read_cfg(args.cfg)
-
-    # 解析配置参数
-    Config.update_args([vars(args), cfg])
-
-    # 整齐打印参数
-    Config.print_args()
-
-    # 模型评估
-    evaluate()
