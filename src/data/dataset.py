@@ -1,8 +1,13 @@
 from torch.utils.data import Dataset
 
+from src.config.config import Config
+
 
 class MyDataSet(Dataset):
-    def __init__(self, root, split='train', transform=None):
+    def __init__(self,
+                 root=Config.args.data.root,
+                 split='train',
+                 transform=None):
         super(Dataset, self).__init__()
         pass
 

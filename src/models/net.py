@@ -15,7 +15,6 @@ class Net(nn.Module):
 
     def forward(self, x):
         pass
-        return x
 
     def initialize_weights(self):
         pass
@@ -27,10 +26,12 @@ def create_model(resume=False):
     :return:
     """
     net = Net()
-    # net = torchvision.models.resnet18(weights=ResNet18_Weights.DEFAULT)
-    # net.conv1 = nn.Conv2d(Config.args.model.in_channels, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
-    # net.fc = nn.Linear(512, Config.args.model.num_classes)
-    # print(net)
+
+    # 测试专用
+    net = torchvision.models.resnet18(weights=ResNet18_Weights.DEFAULT)
+    net.conv1 = nn.Conv2d(Config.args.model.in_channels, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
+    net.fc = nn.Linear(512, Config.args.model.num_classes)
+
     if resume:
         ckpt = get_output_path(filename=Config.args.eval.resume, type='checkpoint')
         checkpoint = torch.load(ckpt)

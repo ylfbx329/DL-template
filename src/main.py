@@ -1,51 +1,76 @@
 import argparse
+import os
 
 from src.config.config import Config
-from src.evaluate.evaluate import evaluate
-from src.train.train import train
-from src.utils.utils import read_cfg, wandb_init
+from src.utils.utils import read_cfg, wandb_init, logging_init
 
 
 def parse_args():
     """
-    解析命令行参数
+    解析命令行、配置文件，构建配置类
     """
     # 设置命令行参数
     parser = argparse.ArgumentParser(description='Deep learning template project')
-    # 必要参数
-    parser.add_argument('cfg', default='./configs/default.yaml',
+    # 配置文件
+    parser.add_argument('-cfg', default='./configs/default.yaml',
                         help='path to config file')
     # 可选参数
-    parser.add_argument('--is_train', action='store_true', default=False,
+    parser.add_argument('-train', dest='train_model', action='store_true', default=False,
                         help='train model')
-    parser.add_argument('--is_eval', action='store_true', default=False,
+    parser.add_argument('-test', dest='eval_model', action='store_true', default=False,
                         help='eval model')
+    parser.add_argument('-wandb', action='store_true', default=False,
+                        help='use wandb')
     # 在此添加更多命令行参数
 
     # 解析参数
     args = parser.parse_args()
-    return args
 
+    # 设置配置文件名为实验名
+    args.exp_name = os.path.basename(args.cfg).split('.')[0]
 
-if __name__ == '__main__':
-    # 解析命令行参数
-    args = parse_args()
     # 读取配置文件
     cfg = read_cfg(args.cfg)
 
     # 设置所有参数全局可用
     Config.update_args([vars(args), cfg])
 
+
+def main():
+    """
+    项目主函数
+    """
+    # 解析命令行参数
+    parse_args()
+
+    # 配置logging
+    mode = []
+    if Config.args.train_model:
+        mode.append('_train')
+    if Config.args.eval_model:
+        mode.append('_eval')
+    logfile = Config.args.exp_name + ''.join(mode) + '.log'
+    logging_init(logfile)
+
     # 整齐打印参数
     Config.print_args()
 
-    if Config.args.use_wandb:
+    # Config类创建后引入，避免函数声明失败
+    from src.train.train import train
+    from src.evaluate.evaluate import evaluate
+
+    # 启用wandb
+    if Config.args.wandb:
         wandb_init()
 
     # 模型训练
-    if args.is_train:
+    if Config.args.train_model:
         train()
 
     # 模型验证
-    if args.is_eval:
+    if Config.args.eval_model:
         evaluate()
+
+
+if __name__ == '__main__':
+    main()

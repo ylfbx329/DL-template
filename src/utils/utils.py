@@ -1,7 +1,9 @@
+import logging
 import os
-import yaml
-import wandb
+
 import torch
+import wandb
+import yaml
 from torchvision.transforms import v2
 
 from src.config.config import Config
@@ -29,6 +31,20 @@ def wandb_init():
         name=Config.args.exp_name,
         config=argsdict,
         dir=exp_path
+    )
+
+
+def logging_init(filename,
+                 level=logging.INFO,
+                 mode='a'):
+    logfile = get_output_path(filename, type='log')
+    logging.basicConfig(
+        level=level,
+        format='%(asctime)s - %(levelname)s - %(message)s',
+        handlers=[
+            logging.FileHandler(logfile, mode=mode),
+            logging.StreamHandler()
+        ]
     )
 
 
@@ -84,10 +100,5 @@ def save_ckpt(path, epoch, model, optimizer, loss=None):
         'epoch': epoch,
         'model_state_dict': model.state_dict(),
         'optimizer_state_dict': optimizer.state_dict(),
-        'loss': loss,
-        'hyperparameters': {
-            'learning_rate': None,
-            'batch_size': None,
-            'num_epochs': None
-        }
+        'loss': loss
     }, path)

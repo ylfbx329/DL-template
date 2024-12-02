@@ -4,12 +4,14 @@
 
 ## TODO List
 
-- [ ] 将训练和验证日志保存为文件
+- [x] 训练/测试日志持久化保存
 - [x] 模型验证
 - [x] 训练可视化（TensorBoard、Visdom、**WandB**）
     - [ ] Rethink WandB功能
 - [x] 项目空目录追踪
 - [ ] 多卡训练支持
+- [ ] 随机种子设置
+- [ ] lr_scheduler定义与使用
 
 ## 使用指南
 
@@ -21,15 +23,18 @@
    ```shell
    conda env update --file environment.yml --prune
    ```
-2. 参考`configs/default.yaml`，根据项目需要，在`configs`下创建自己的配置文件
-3. 训练模型，运行`src/main.py`脚本
+2. 参考`configs/default.yaml`，根据项目需要，在`configs`下创建自己的配置文件（e.g., `configs/mnist.yaml`，以下命令以此配置文件为例）
+3. 训练模型
    ```shell
-   python -m src.main ./configs/<your-config>.yaml --is_train
+   cd project_root
+   python -m src.main -cfg ./configs/mnist.yaml -train
    ```
-4. 预测模型，运行`src/main.py`脚本
+4. 预测模型
    ```shell
-   python -m src.main ./configs/<your-config>.yaml --is_eval
+   cd project_root
+   python -m src.main -cfg ./configs/mnist.yaml -test
    ```
+5. 模型检查点、日志文件和预测结果保存在`outputs/mnist`下
 
 ## 项目目录
 
@@ -55,12 +60,14 @@ DL-template                # 项目根目录
 │   ├── criterion          # 损失函数
 │   │   └── criterion.py
 │   ├── train              # 训练
-│   │   ├── train.py       # 训练主脚本
+│   │   ├── train.py       # 训练脚本
 │   │   └── trainer.py     # 单轮训练
 │   ├── evaluate           # 验证
-│   │   └── evaluate.py
-│   └── utils              # 工具文件夹
-│       └── utils.py
+│   │   ├── evaluate.py    # 验证脚本
+│   │   └── tester.py      # 单轮验证
+│   ├── utils              # 工具函数
+│   │   └── utils.py
+│   └── main.py            # 项目主程序
 ├── test                   # 测试文件夹
 ├── outputs                # 实验结果输出文件夹
 │   └── <exp_name>

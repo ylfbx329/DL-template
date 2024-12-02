@@ -1,3 +1,4 @@
+import logging
 import pprint
 from types import SimpleNamespace
 from typing import Dict, List, Union
@@ -50,8 +51,9 @@ class Config:
     @staticmethod
     def print_args():
         """
-        整齐打印Config.args
+        整齐打印Config.args为日志
         :return:
         """
 
-        pprint.pprint(Config.get_argsdict(Config.args))
+        args_str = pprint.pformat(Config.get_argsdict(Config.args))
+        logging.info(args_str)

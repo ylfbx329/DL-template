@@ -1,3 +1,4 @@
+import numpy as np
 from tqdm import tqdm
 
 
@@ -19,8 +20,7 @@ def train_one_epoch(epoch, model, train_loader, criterion, optimizer, device):
     total_batch = len(train_loader)  # 便于调用
     for index, data in tqdm(enumerate(train_loader), desc=f"Epoch {epoch}", total=total_batch):
         # 转移数据
-        inputs, labels = data
-        inputs, labels = inputs.to(device), labels.to(device)
+        inputs, labels = [x.to(device) for x in data]
 
         # 清零梯度
         optimizer.zero_grad()
@@ -40,4 +40,4 @@ def train_one_epoch(epoch, model, train_loader, criterion, optimizer, device):
         # 记录loss
         loss_history.append(loss.item())
 
-    return sum(loss_history) / total_batch
+    return np.mean(loss_history)

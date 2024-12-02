@@ -1,10 +1,9 @@
 proj_root: 'E:\program\DL-template'
-exp_name: 'default'
 device: 'cuda:0'
-use_wandb: true
 
 data:
   root: 'data/raw'
+  num_workers: 0
 
 model:
   in_channels: 1
@@ -15,7 +14,7 @@ train:
   batch_size: 256
   lr: 0.001
   optimizer: 'Adam'
-  save_freq: 1
+  save_freq: 5
 
 eval:
   resume: 'epoch9.pth'
