@@ -1,5 +1,10 @@
-proj_root: 'E:\program\DL-template'
+# 除标注[可选]之外的顶级参数必须保留，否则需要修改对应代码
+# train.ckpt仅可用于恢复训练，不可在修改超参后继续训练，
+# 如：想延长训练轮次，增大epochs后加载ckpt会导致scheduler不按预期更新lr
+
+proj_root: 'E:\program\DL-template' # 必填，绝对路径
 device: 'cuda:0'
+seed: 1
 
 data:
   root: 'data/raw'
@@ -9,13 +14,20 @@ model:
   in_channels: 1
   num_classes: 10
 
-train:
-  epochs: 10
-  batch_size: 256
+optim:
+  name: 'Adam' # optimizer类名
   lr: 0.001
-  optimizer: 'Adam'
+
+sched: # [可选]
+  name: 'CosineAnnealingLR' # scheduler类名
+  T_max: 20                 # scheduler构建时使用的参数，必须严格符合其声明
+
+train:
+  epochs: 20
+  batch_size: 256
   save_freq: 5
+  ckpt: 'epoch9.pth' # [可选]恢复训练使用的检查点，不使用时请删除此项，否则默认加载
 
 eval:
-  resume: 'epoch9.pth'
   batch_size: 256
+  ckpt: 'epoch9.pth' # 测试使用的模型检查点

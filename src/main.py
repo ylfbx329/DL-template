@@ -2,7 +2,7 @@ import argparse
 import os
 
 from src.config.config import Config
-from src.utils.utils import read_cfg, wandb_init, logging_init
+from src.utils.utils import read_cfg, wandb_init, logging_init, fix_random_seed
 
 
 def parse_args():
@@ -53,7 +53,10 @@ def main():
     logging_init(logfile)
 
     # 整齐打印参数
-    Config.print_args()
+    Config.logging_args()
+
+    # 固定随机种子
+    fix_random_seed(Config.args.seed)
 
     # Config类创建后引入，避免函数声明失败
     from src.train.train import train

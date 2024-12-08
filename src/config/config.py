@@ -49,11 +49,10 @@ class Config:
                 for key, value in vars(namespace).items()}
 
     @staticmethod
-    def print_args():
+    def logging_args():
         """
         整齐打印Config.args为日志
         :return:
         """
-
         args_str = pprint.pformat(Config.get_argsdict(Config.args))
         logging.info(args_str)

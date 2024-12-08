@@ -8,7 +8,7 @@ from src.criterion.criterion import create_criterion
 from src.data.data_loader import get_data_loader
 from src.evaluate.tester import test_once
 from src.models.net import create_model
-from src.utils.utils import get_output_path
+from src.utils.utils import get_output_path, load_ckpt
 
 
 @torch.no_grad()
@@ -27,15 +27,14 @@ def evaluate():
     logging.info('Data load complete.')
 
     # 加载模型、初始化损失函数
-    model = create_model(resume=True)
+    model = create_model()
+    model.to(device)
     criterion = create_criterion()
+    load_ckpt(eval_param.ckpt, model)
     logging.info('model and criterion create complete.')
 
     # 设置评估模式
     model.eval()
-
-    # 转移模型
-    model.to(device)
 
     # 用完整数据验证模型，得到平均loss、正确率、模型输出结果
     eval_loss, acc_rate, results = test_once(model, test_loader, criterion, device)
@@ -44,8 +43,8 @@ def evaluate():
 
     # 保存结果
     results = np.concatenate(results)
-    resume = eval_param.resume.split(".")[0]
-    res_path = get_output_path(filename=f'{resume}-results.npy', type='result')
+    ckpt = eval_param.ckpt.split(".")[0]
+    res_path = get_output_path(filename=f'{ckpt}-results.npy', filetype='result')
     np.save(res_path, results)
     logging.info(f'Save results at {res_path}')
 

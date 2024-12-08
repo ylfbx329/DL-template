@@ -10,8 +10,11 @@
     - [ ] Rethink WandB功能
 - [x] 项目空目录追踪
 - [ ] 多卡训练支持
-- [ ] 随机种子设置
-- [ ] lr_scheduler定义与使用
+- [x] 随机种子设置
+- [x] lr_scheduler定义与使用
+- [x] torchinfo summary
+- [x] checkpoint加载
+- [ ] 验证集验证模型并保存最优
 
 ## 使用指南
 

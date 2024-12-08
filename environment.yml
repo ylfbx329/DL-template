@@ -9,8 +9,8 @@ dependencies:
   - pytorch::torchvision
   - pytorch::pytorch-cuda=12.1
   - conda-forge::matplotlib
+  - conda-forge::torchinfo
   - conda-forge::tqdm
-  - conda-forge::pandas
   - pip
   - pip:
       - wandb
