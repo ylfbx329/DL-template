@@ -11,19 +11,18 @@ class Config:
     args = SimpleNamespace()
 
     @staticmethod
-    def update_args(new_args: Union[Dict, List[Dict]]) -> None:
+    def update_args(new_args: Union[Dict, List[Dict]], src_namespace: SimpleNamespace = args):
         """
         更新Config.args
-        :param new_args:
-        :return:
+        :param new_args: 参数字典
+        :param src_namespace: 待更新的namespace，默认为整个args
         """
 
-        def _recursive_update(namespace, updates):
+        def _recursive_update(namespace: SimpleNamespace, updates: Dict):
             """
             将参数字典递归更新到namespace中
             :param namespace: 待更新的namespace
             :param updates: 参数字典
-            :return:
             """
             for key, value in updates.items():
                 if isinstance(value, dict):
@@ -36,14 +35,14 @@ class Config:
         if isinstance(new_args, dict):
             new_args = [new_args]
         for param_dict in new_args:
-            _recursive_update(Config.args, param_dict)
+            _recursive_update(src_namespace, param_dict)
 
     @staticmethod
-    def get_argsdict(namespace):
+    def get_argsdict(namespace: SimpleNamespace = args) -> Dict:
         """
         将namespace递归解析为字典
-        :param namespace:
-        :return:
+        :param namespace: 待解析的namespace
+        :return: 解析出的参数字典
         """
         return {key: Config.get_argsdict(value) if isinstance(value, SimpleNamespace) else value
                 for key, value in vars(namespace).items()}
@@ -52,7 +51,6 @@ class Config:
     def logging_args():
         """
         整齐打印Config.args为日志
-        :return:
         """
-        args_str = pprint.pformat(Config.get_argsdict(Config.args))
+        args_str = pprint.pformat(Config.get_argsdict())
         logging.info(args_str)

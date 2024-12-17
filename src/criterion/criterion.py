@@ -1,9 +1,9 @@
 import torch.nn as nn
 
 
-def create_criterion():
+def get_criterion() -> nn.Module:
     """
-    返回初始化loss对象
-    :return:
+    构建loss对象
+    :return: 初始化的loss对象
     """
     return nn.CrossEntropyLoss()

@@ -1,8 +1,7 @@
 # 除标注[可选]之外的顶级参数必须保留，否则需要修改对应代码
-# train.ckpt仅可用于恢复训练，不可在修改超参后继续训练，
-# 如：想延长训练轮次，增大epochs后加载ckpt会导致scheduler不按预期更新lr
+# train.ckpt仅可用于恢复训练，不可在修改epoch后延长训练，否则会导致scheduler不按预期更新lr
 
-proj_root: 'E:\program\DL-template' # 必填，绝对路径
+proj_root: '/path/to/your/project'  # 必填，绝对路径
 device: 'cuda:0'
 seed: 1
 
@@ -15,19 +14,27 @@ model:
   num_classes: 10
 
 optim:
-  name: 'Adam' # optimizer类名
+  name: 'Adam'                      # optimizer类名
   lr: 0.001
 
-sched: # [可选]
-  name: 'CosineAnnealingLR' # scheduler类名
-  T_max: 20                 # scheduler构建时使用的参数，必须严格符合其声明
+sched: # [可选]调度器设置
+  name: 'CosineAnnealingLR'         # scheduler类名
+  T_max: 10                         # scheduler构建时使用的参数，必须严格符合其声明
 
 train:
-  epochs: 20
+  epochs: 10
   batch_size: 256
-  save_freq: 5
-  ckpt: 'epoch9.pth' # [可选]恢复训练使用的检查点，不使用时请删除此项，否则默认加载
+  log_iter: 0                       # 一个epoch中打印日志的频率，不需要时设置为零
+  val_epoch: 2                      # 使用验证集验证模型的频率
+  save_epoch: 5                     # 保存ckpt的频率
+  ckpt: 'epoch5.pth'                # [可选]用于恢复训练的ckpt，不使用时请删除此项，否则默认加载
 
-eval:
+val:
   batch_size: 256
-  ckpt: 'epoch9.pth' # 测试使用的模型检查点
+  log_iter: 0
+  ckpt: 'epoch9.pth'                # 用于验证的ckpt
+
+test:
+  batch_size: 256
+  log_iter: 0
+  ckpt: 'epoch9.pth'                # 用于测试的ckpt

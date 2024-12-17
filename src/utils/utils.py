@@ -6,7 +6,9 @@ import numpy as np
 import torch
 import wandb
 import yaml
-from torchvision.transforms import v2
+from torch import nn
+from torch.optim import Optimizer
+from torch.optim.lr_scheduler import LRScheduler
 
 from src.config.config import Config
 
@@ -25,12 +27,11 @@ def read_cfg(cfg_path):
 def wandb_init():
     """
     初始化WandB
-    :return:
     """
     wandb.login()
 
     project = os.path.basename(Config.args.proj_root)
-    argsdict = Config.get_argsdict(Config.args)
+    argsdict = Config.get_argsdict()
     exp_path = get_exp_path()
     wandb.init(
         project=project,
@@ -40,22 +41,27 @@ def wandb_init():
     )
 
 
-def logging_init(filename,
+def logging_init(log_filename=None,
                  level=logging.INFO,
                  mode='a'):
     """
     初始化日志模块
-    :param filename:
-    :param level:
-    :param mode:
-    :return:
+    :param log_filename: 日志文件名，默认为配置文件名+运行模式
+    :param level: 日志级别，默认为INFO
+    :param mode: 写入模式，默认为追加
     """
-    logfile = get_output_path(filename, filetype='log')
+    if log_filename is None:
+        suffix = ''
+        suffix += '_train' if Config.args.train_model else ''
+        suffix += '_val' if Config.args.val_model else ''
+        suffix += '_test' if Config.args.test_model else ''
+        log_filename = Config.args.exp_name + suffix + '.log'
+    log_filepath = get_output_path(log_filename, filetype='log')
     logging.basicConfig(
         level=level,
         format='%(asctime)s - %(levelname)s - %(message)s',
         handlers=[
-            logging.FileHandler(logfile, mode=mode),
+            logging.FileHandler(log_filepath, mode=mode),
             logging.StreamHandler()
         ]
     )
@@ -65,7 +71,6 @@ def fix_random_seed(seed):
     """
     固定随机种子
     :param seed:
-    :return:
     """
     random.seed(seed)
     np.random.seed(seed)
@@ -77,7 +82,7 @@ def fix_random_seed(seed):
 def get_exp_path() -> str:
     """
     获取实验输出目录的绝对路径
-    :return:
+    :return: 实验输出目录的绝对路径
     """
     # 拼装实验输出目录
     exp_path = os.path.join(Config.args.proj_root, 'outputs', Config.args.exp_name)
@@ -89,39 +94,23 @@ def get_output_path(filename, filetype):
     获取输出文件的绝对路径
     :param filename: 输出文件的完整文件名
     :param filetype: 输出文件类型，必须是['checkpoint', 'log', 'result']其中之一
-    :return:
+    :return: 输出文件的绝对路径
     """
-    assert filetype in ['checkpoint', 'log',
-                        'result'], f'type must be "checkpoint" or "log" or "result", but got {filetype}'
+    assert filetype in ['checkpoint', 'log', 'result'], f'type must be in ["checkpoint", "log", "result"], but got {filetype}'
     path = os.path.join(get_exp_path(), filetype, filename)
     os.makedirs(os.path.dirname(path), exist_ok=True)
     return path
 
 
-def get_transform():
+def save_ckpt(ckpt_filename: str, epoch: int, model: nn.Module, optimizer: Optimizer, scheduler: LRScheduler, loss=None):
     """
-    定义变换操作，可自定义修改
-
-    尽量使用torchvision.transforms.v2接口定义操作
-    :return: 变换操作
-    """
-    transform = v2.Compose([
-        v2.PILToTensor(),
-        v2.ConvertImageDtype(torch.float32),
-    ])
-    return transform
-
-
-def save_ckpt(ckpt_filename, epoch, model, optimizer, scheduler, loss=None):
-    """
-    保存ckpt
-    :param ckpt_filename:
-    :param epoch:
-    :param model:
-    :param optimizer:
-    :param scheduler:
-    :param loss:
-    :return:
+    训练过程中保存ckpt
+    :param ckpt_filename: ckpt文件名
+    :param epoch: ckpt所属的训练轮次
+    :param model: 模型对象
+    :param optimizer: 优化器对象
+    :param scheduler: 调度器对象
+    :param loss: 本轮训练损失
     """
     path = get_output_path(ckpt_filename, filetype='checkpoint')
     torch.save({
@@ -134,14 +123,16 @@ def save_ckpt(ckpt_filename, epoch, model, optimizer, scheduler, loss=None):
     logging.info(f'Save checkpoint at {path}')
 
 
-def load_ckpt(ckpt_filename, model, optimizer=None, scheduler=None):
+def load_ckpt(ckpt_filename: str,
+              model: nn.Module,
+              optimizer: Optimizer = None,
+              scheduler: LRScheduler = None):
     """
-    加载ckpt
-    :param ckpt_filename:
-    :param model:
-    :param optimizer:
-    :param scheduler:
-    :return:
+    为模型、优化器和调度器加载ckpt
+    :param ckpt_filename: ckpt文件名
+    :param model: 模型对象
+    :param optimizer: 优化器对象，仅用于训练阶段
+    :param scheduler: 调度器对象，仅用于训练阶段
     """
     path = get_output_path(ckpt_filename, filetype='checkpoint')
     assert os.path.exists(path), f'checkpoint: {path} not exist!'

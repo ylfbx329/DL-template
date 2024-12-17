@@ -1,19 +1,19 @@
-from torch import optim
+from torch import optim, nn
 from torch.optim import lr_scheduler
 from torch.optim.lr_scheduler import LambdaLR
 
 from src.config.config import Config
 
 
-def create_optimizer(model,
-                     lr=Config.args.optim.lr,
-                     optimizer_name=Config.args.optim.name):
+def get_optim_sched(optimizer_name: str,
+                    model: nn.Module,
+                    lr: float):
     """
-    构建优化器和调度器
-    :param model:
-    :param lr:
-    :param optimizer_name:
-    :return:
+    构建优化器和调度器，根据配置文件自动设置调度器，配置文件中无调度器设置则采用恒定调度器，与不采用调度器效果等同
+    :param optimizer_name: 优化器类名
+    :param model: 模型对象
+    :param lr: 学习率
+    :return: 优化器和调度器
     """
     optim_param = {key: value
                    for key, value in vars(Config.args.optim).items()
