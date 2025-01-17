@@ -1,7 +1,9 @@
 import logging
+import os
 
 import torch
-from torch.utils.data import DataLoader
+import torchvision
+from torch.utils.data import DataLoader, random_split
 from torchvision.transforms import v2
 
 from src.config.config import Config
@@ -23,7 +25,6 @@ def get_dataloader() -> tuple[DataLoader, DataLoader, DataLoader]:
     batch_size = (train_param.batch_size,
                   val_param.batch_size,
                   test_param.batch_size)
-    num_workers = data_param.num_workers
     transform = v2.Compose([v2.PILToTensor(),
                             v2.ConvertImageDtype(torch.float32)])
 
@@ -40,8 +41,19 @@ def get_dataloader() -> tuple[DataLoader, DataLoader, DataLoader]:
     val_set = MyDataSet(root=data_root, split='val', transform=transform)
     test_set = MyDataSet(root=data_root, split='test', transform=transform)
 
+    # 测试专用 start
+    train_set = torchvision.datasets.MNIST(root=data_root, train=True, download=True, transform=transform)
+    train_size = int(0.8 * len(train_set))
+    val_size = len(train_set) - train_size
+    train_set, val_set = random_split(train_set, [train_size, val_size])
+    test_set = torchvision.datasets.MNIST(root=data_root, train=False, download=True, transform=transform)
+    # 测试专用 end
+
+    num_workers = min([os.cpu_count(), batch_size[0] if batch_size[0] > 1 else 0, 8]) if os.name == 'posix' else 0
     train_loader = DataLoader(train_set, batch_size=batch_size[0], shuffle=True, num_workers=num_workers)
+    num_workers = min([os.cpu_count(), batch_size[1] if batch_size[1] > 1 else 0, 8]) if os.name == 'posix' else 0
     val_loader = DataLoader(val_set, batch_size=batch_size[1], shuffle=False, num_workers=num_workers)
+    num_workers = min([os.cpu_count(), batch_size[2] if batch_size[2] > 1 else 0, 8]) if os.name == 'posix' else 0
     test_loader = DataLoader(test_set, batch_size=batch_size[2], shuffle=False, num_workers=num_workers)
     logging.info(f'train sample: {len(train_set)}, val sample: {len(val_set)}, test sample {len(test_set)}')
     logging.info('Data load complete.')

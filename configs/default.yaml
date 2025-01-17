@@ -1,40 +1,40 @@
-# 除标注[可选]之外的顶级参数必须保留，否则需要修改对应代码
-# train.ckpt仅可用于恢复训练，不可在修改epoch后延长训练，否则会导致scheduler不按预期更新lr
+# 除标注[可选]之外的顶级参数变量必须保留，否则需要修改对应代码
+# train.ckpt仅用于恢复意外中断的训练，不可在修改epoch后延长训练，否则会导致学习率调度器不按预期更新学习率
 
-proj_root: '/path/to/your/project'  # 必填，绝对路径
-device: 'cuda:0'
+proj_root: "/path/to/your/project" # 必填，绝对路径
+device: "cuda:0"
 seed: 1
 
 data:
-  root: 'data/raw'
-  num_workers: 0
+  root: "data/raw"
 
 model:
   in_channels: 1
   num_classes: 10
 
 optim:
-  name: 'Adam'                      # optimizer类名
+  name: "Adam" # 优化器的类名
   lr: 0.001
 
 sched: # [可选]调度器设置
-  name: 'CosineAnnealingLR'         # scheduler类名
-  T_max: 10                         # scheduler构建时使用的参数，必须严格符合其声明
+  name: "CosineAnnealingLR" # 学习率调度器的类名
+  T_max: 5 # 学习率调度器构建时所需参数，必须严格符合其函数声明
 
 train:
-  epochs: 10
+  epochs: 5
   batch_size: 256
-  log_iter: 0                       # 一个epoch中打印日志的频率，不需要时设置为零
-  val_epoch: 2                      # 使用验证集验证模型的频率
-  save_epoch: 5                     # 保存ckpt的频率
-  ckpt: 'epoch5.pth'                # [可选]用于恢复训练的ckpt，不使用时请删除此项，否则默认加载
+  log_iter: 0 # 一个epoch内打印日志的频率，不需要时设置为零
+  val_start: 2 # 开始验证的epoch，跳过对训练初期模型的不必要验证
+  val_epoch: 2 # 使用验证集验证模型的频率
+  save_epoch: 5 # 保存ckpt的频率
+#  ckpt: "epoch5.pth" # [可选]用于恢复训练的ckpt，不使用时请删除此项，否则默认加载
 
 val:
   batch_size: 256
   log_iter: 0
-  ckpt: 'epoch9.pth'                # 用于验证的ckpt
+  ckpt: "epoch4.pth" # 用于验证的ckpt
 
 test:
   batch_size: 256
   log_iter: 0
-  ckpt: 'epoch9.pth'                # 用于测试的ckpt
+  ckpt: "epoch4.pth" # 用于测试的ckpt

@@ -12,11 +12,11 @@ def plot(x, y, xlabel, ylabel, image_filename):
     :param ylabel: y轴标签
     :param image_filename: 用于保存的图像文件名
     """
+    plt.figure(layout='constrained')
     plt.plot(x, y)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     # 避免折线贴边，使图像美观
     plt.xlim([x[0] - 2, x[-1] + 2])
-    plt.tight_layout()
     plt.savefig(get_output_path(filename=image_filename, filetype='result'))
     plt.show()

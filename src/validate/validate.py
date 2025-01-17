@@ -33,8 +33,8 @@ def validate(val_loader):
     # 设置模型为评估模式
     model.eval()
 
-    # 使用测试集测试模型性能，得到预测结果，标签，平均损失
-    result, label, loss = validate_one_epoch(model, val_loader, criterion, device)
+    # 使用测试集测试模型性能，得到模型输出，预测结果，标签，平均损失
+    output, result, label, loss = validate_one_epoch(model, val_loader, criterion, device)
 
     # 信息输出，可自定义
     logging.info(f'Validate: Loss: {loss}')

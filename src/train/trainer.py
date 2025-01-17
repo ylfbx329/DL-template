@@ -6,7 +6,7 @@ from tqdm import tqdm
 from src.config.config import Config
 
 
-def train_one_epoch(epoch, model, train_loader, criterion, optimizer, device) -> int:
+def train_one_epoch(epoch, model, train_loader, criterion, optimizer, device):
     """
     训练一个epoch
     :param epoch: 第epoch轮训练

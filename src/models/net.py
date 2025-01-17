@@ -1,4 +1,6 @@
 import torch.nn as nn
+import torchvision
+from torchvision.models import ResNet18_Weights
 
 from src.config.config import Config
 
@@ -32,4 +34,11 @@ def create_model() -> nn.Module:
     model_params = Config.args.model
     net = Net(in_channels=model_params.in_channels,
               num_classes=model_params.num_classes)
+
+    # 测试专用 start
+    net = torchvision.models.resnet18(weights=ResNet18_Weights.DEFAULT)
+    net.conv1 = nn.Conv2d(model_params.in_channels, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
+    net.fc = nn.Linear(512, model_params.num_classes)
+    # 测试专用 end
+
     return net

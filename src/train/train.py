@@ -70,19 +70,19 @@ def train(train_loader, val_loader):
         # 每个epoch结束后的信息输出，可自定义
         logging.info(f'Epoch [{epoch}/{total_epochs}]: lr: {epoch_lr[-1]}, Loss: {epoch_loss}')
 
+        # 在设定的轮数和训练结束时保存ckpt
+        if epoch % train_param.save_epoch == 0 or epoch == total_epochs - 1:
+            ckpt_filename = f'epoch{epoch}.pth'
+            save_ckpt(ckpt_filename, epoch, model, optimizer, scheduler, epoch_loss)
+
         # 在设定的轮数和训练结束时使用验证集验证模型
-        if epoch % train_param.val_epoch == 0:
-            _, _, val_loss = validate_one_epoch(model, val_loader, criterion, device)
+        if epoch > train_param.val_start and epoch % train_param.val_epoch == 0:
+            _, _, _, val_loss = validate_one_epoch(model, val_loader, criterion, device)
             # 保存在验证集表现最优的模型
             if val_loss < best_val_loss:
                 best_val_loss = val_loss
                 logging.info(f'Validate: Epoch: {epoch}, Best Loss: {val_loss}')
                 save_ckpt('best_val.pth', epoch, model, optimizer, scheduler, epoch_loss)
-
-        # 在设定的轮数和训练结束时保存ckpt
-        if epoch % train_param.save_epoch == 0 or epoch == total_epochs - 1:
-            ckpt_filename = f'epoch{epoch}.pth'
-            save_ckpt(ckpt_filename, epoch, model, optimizer, scheduler, epoch_loss)
 
         # 启用wandb时记录日志
         if Config.args.wandb:

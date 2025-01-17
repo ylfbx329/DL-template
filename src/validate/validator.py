@@ -8,19 +8,20 @@ from src.config.config import Config
 
 
 @torch.no_grad()
-def validate_one_epoch(model, val_loader, criterion, device) -> tuple[np.ndarray, np.ndarray, float]:
+def validate_one_epoch(model, val_loader, criterion, device):
     """
     使用验证集评估模型性能
     :param model: 模型对象
     :param val_loader: 验证集dataloader
     :param criterion: 损失函数
     :param device: 验证设备
-    :return: 预测结果，标签，平均损失
+    :return: 模型输出，预测结果，标签，平均损失
     """
     # 存储每个batch的loss
     loss_history = []
 
-    # 保存结果和标签
+    # 保存输出、结果和标签
+    out_list = []
     res_list = []
     label_list = []
 
@@ -40,6 +41,9 @@ def validate_one_epoch(model, val_loader, criterion, device) -> tuple[np.ndarray
         # 模型输出后处理，可自定义
         result = torch.argmax(outputs, dim=1)
 
+        # 记录输出
+        out_list.append(outputs.cpu().numpy())
+
         # 记录结果
         res_list.append(result.cpu().numpy())
 
@@ -53,7 +57,8 @@ def validate_one_epoch(model, val_loader, criterion, device) -> tuple[np.ndarray
         if log_iter != 0 and index % log_iter == 0:
             logging.info(f'Batch [{index}/{total_batch}]: Loss: {np.mean(loss_history)}')
 
+    out = np.concatenate(out_list)
     res = np.concatenate(res_list)
     label = np.concatenate(label_list)
     avg_loss = np.mean(loss_history)
-    return res, label, avg_loss
+    return out, res, label, avg_loss
