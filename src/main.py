@@ -25,13 +25,15 @@ def parse_args():
                         help='validate model')
     parser.add_argument('-test', dest='test_model', action='store_true', default=False,
                         help='test model')
-    parser.add_argument('-wandb', action='store_true', default=False,
-                        help='use wandb')
+    # parser.add_argument('-wandb', action='store_true', default=False,
+    #                     help='use wandb')
     # 在此添加更多命令行参数
 
     # 解析参数
     args = parser.parse_args()
 
+    # 设置工作目录为项目根目录
+    args.proj_root = os.getcwd()
     # 设置配置文件名为实验名
     args.exp_name = os.path.basename(args.cfg).rsplit('.', 1)[0]
 
@@ -59,8 +61,8 @@ def main():
     fix_random_seed(seed=Config.args.seed)
 
     # 启用wandb
-    if Config.args.wandb:
-        wandb_init()
+    # if Config.args.wandb:
+    #     wandb_init()
 
     # 数据加载
     train_loader, val_loader, test_loader = get_dataloader()

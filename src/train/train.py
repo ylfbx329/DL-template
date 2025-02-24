@@ -32,9 +32,7 @@ def train(train_loader, val_loader):
     model = create_model()
     model.to(device)
     criterion = get_criterion()
-    optimizer, scheduler = get_optim_sched(optimizer_name=optim_param.name,
-                                           model=model,
-                                           lr=optim_param.lr)
+    optimizer, scheduler = get_optim_sched(model=model)
 
     # 加载ckpt
     if hasattr(train_param, 'ckpt'):

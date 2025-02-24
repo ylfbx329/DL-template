@@ -46,7 +46,7 @@ def logging_init(log_filename=None,
                  mode='a'):
     """
     初始化日志模块
-    :param log_filename: 日志文件名，默认为配置文件名+运行模式
+    :param log_filename: 日志文件名，默认为配置文件名_运行模式
     :param level: 日志级别，默认为INFO
     :param mode: 写入模式，默认为追加
     """
@@ -70,7 +70,7 @@ def logging_init(log_filename=None,
 def fix_random_seed(seed):
     """
     固定随机种子
-    :param seed:
+    :param seed: 随机种子
     """
     random.seed(seed)
     np.random.seed(seed)
@@ -91,12 +91,12 @@ def get_exp_path() -> str:
 
 def get_output_path(filename, filetype):
     """
-    获取输出文件的绝对路径
+    获取输出文件的绝对路径，创建父目录
     :param filename: 输出文件的完整文件名
     :param filetype: 输出文件类型，必须是['checkpoint', 'log', 'result']其中之一
     :return: 输出文件的绝对路径
     """
-    assert filetype in ['checkpoint', 'log', 'result'], f'type must be in ["checkpoint", "log", "result"], but got {filetype}'
+    assert filetype in ['checkpoint', 'log', 'result'], f'filetype must be in ["checkpoint", "log", "result"], but got {filetype}'
     path = os.path.join(get_exp_path(), filetype, filename)
     os.makedirs(os.path.dirname(path), exist_ok=True)
     return path

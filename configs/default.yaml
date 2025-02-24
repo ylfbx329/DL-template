@@ -1,7 +1,6 @@
 # 除标注[可选]之外的顶级参数变量必须保留，否则需要修改对应代码
 # train.ckpt仅用于恢复意外中断的训练，不可在修改epoch后延长训练，否则会导致学习率调度器不按预期更新学习率
 
-proj_root: "/path/to/your/project" # 必填，绝对路径
 device: "cuda:0"
 seed: 1
 
@@ -11,6 +10,9 @@ data:
 model:
   in_channels: 1
   num_classes: 10
+
+loss:
+  name: 'CrossEntropyLoss'
 
 optim:
   name: "Adam" # 优化器的类名
