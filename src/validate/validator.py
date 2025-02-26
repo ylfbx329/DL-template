@@ -15,7 +15,7 @@ def validate_one_epoch(model, val_loader, criterion, device):
     :param val_loader: 验证集dataloader
     :param criterion: 损失函数
     :param device: 验证设备
-    :return: 模型输出，预测结果，标签，平均损失
+    :return: 模型输出，预测结果，预测标签，平均损失
     """
     # 存储每个batch的loss
     loss_history = []
@@ -54,8 +54,8 @@ def validate_one_epoch(model, val_loader, criterion, device):
         loss_history.append(loss.item())
 
         # 日志打印
-        if log_iter != 0 and index % log_iter == 0:
-            logging.info(f'Batch [{index}/{total_batch}]: Loss: {np.mean(loss_history)}')
+        if log_iter > 0 and index % log_iter == 0:
+            logging.info(f'Batch [{index}/{total_batch}]: mean loss: {np.mean(loss_history)}')
 
     out = np.concatenate(out_list)
     res = np.concatenate(res_list)

@@ -4,7 +4,6 @@ import random
 
 import numpy as np
 import torch
-import wandb
 import yaml
 from torch import nn
 from torch.optim import Optimizer
@@ -17,28 +16,28 @@ def read_cfg(cfg_path):
     """
     读取YAML格式的配置文件，返回字典
     :param cfg_path: 配置文件完整路径
-    :return: 参数字典:
+    :return: 参数字典
     """
     with open(cfg_path, 'r', encoding='utf-8') as file:
         cfg = yaml.safe_load(file)
     return cfg
 
 
-def wandb_init():
-    """
-    初始化WandB
-    """
-    wandb.login()
-
-    project = os.path.basename(Config.args.proj_root)
-    argsdict = Config.get_argsdict()
-    exp_path = get_exp_path()
-    wandb.init(
-        project=project,
-        name=Config.args.exp_name,
-        config=argsdict,
-        dir=exp_path
-    )
+# def wandb_init():
+#     """
+#     初始化WandB
+#     """
+#     wandb.login()
+#
+#     project = os.path.basename(Config.args.proj_root)
+#     argsdict = Config.get_argsdict()
+#     exp_path = get_exp_path()
+#     wandb.init(
+#         project=project,
+#         name=Config.args.exp_name,
+#         config=argsdict,
+#         dir=exp_path
+#     )
 
 
 def logging_init(log_filename=None,
@@ -102,7 +101,12 @@ def get_output_path(filename, filetype):
     return path
 
 
-def save_ckpt(ckpt_filename: str, epoch: int, model: nn.Module, optimizer: Optimizer, scheduler: LRScheduler, loss=None):
+def save_ckpt(ckpt_filename: str,
+              model: nn.Module,
+              optimizer: Optimizer = None,
+              scheduler: LRScheduler = None,
+              epoch: int = None,
+              loss: float = None):
     """
     训练过程中保存ckpt
     :param ckpt_filename: ckpt文件名
@@ -112,7 +116,9 @@ def save_ckpt(ckpt_filename: str, epoch: int, model: nn.Module, optimizer: Optim
     :param scheduler: 调度器对象
     :param loss: 本轮训练损失
     """
+    # 获取ckpt保存路径
     path = get_output_path(ckpt_filename, filetype='checkpoint')
+    # 保存ckpt
     torch.save({
         'epoch': epoch,
         'model': model.state_dict(),
@@ -120,6 +126,7 @@ def save_ckpt(ckpt_filename: str, epoch: int, model: nn.Module, optimizer: Optim
         'scheduler': scheduler.state_dict(),
         'loss': loss
     }, path)
+    # 打印保存信息
     logging.info(f'Save checkpoint at {path}')
 
 

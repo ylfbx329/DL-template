@@ -46,7 +46,7 @@ def train_one_epoch(epoch, model, train_loader, criterion, optimizer, device):
         loss_history.append(loss.item())
 
         # 日志打印
-        if log_iter != 0 and index % log_iter == 0:
-            logging.info(f'Batch [{index}/{total_batch}]: Loss: {np.mean(loss_history)}')
+        if log_iter > 0 and index % log_iter == 0:
+            logging.info(f'Batch [{index}/{total_batch}]: mean loss: {np.mean(loss_history)}')
 
     return np.mean(loss_history)

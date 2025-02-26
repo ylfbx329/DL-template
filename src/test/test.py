@@ -14,13 +14,13 @@ from src.utils.utils import get_output_path, load_ckpt
 @torch.no_grad()
 def test(test_loader):
     """
-    测试模型的完整流程
+    测试模型的通用完整流程
     :param test_loader: 测试集dataloader
     """
     logging.info('Start test...')
     test_param = Config.args.test  # 便于调用
 
-    # 评估设备设置
+    # 设置测试设备
     device = torch.device(Config.args.device)
 
     # 初始化模型、损失函数
@@ -35,7 +35,7 @@ def test(test_loader):
     # 设置模型为评估模式
     model.eval()
 
-    # 使用测试集测试模型性能，得到模型输出，预测结果，标签，平均损失
+    # 使用测试集测试模型性能，得到模型输出，预测结果，预测标签，平均损失
     output, result, label, loss = test_one_epoch(model, test_loader, criterion, device)
 
     # 信息输出，可自定义
@@ -44,8 +44,8 @@ def test(test_loader):
     # 计算指标
     metrics(label, result)
 
-    # 保存结果
-    ckpt = test_param.ckpt.split('.')[0]
+    # 保存测试结果
+    ckpt = test_param.ckpt.rsplit('.', 1)[0]
     res_path = get_output_path(filename=f'{ckpt}-result.npy', filetype='result')
     label_path = get_output_path(filename=f'{ckpt}-label.npy', filetype='result')
     np.save(res_path, result)

@@ -5,7 +5,7 @@ from src.config.config import Config
 from src.data.data_loader import get_dataloader
 from src.test.test import test
 from src.train.train import train
-from src.utils.utils import read_cfg, wandb_init, logging_init, fix_random_seed
+from src.utils.utils import read_cfg, logging_init, fix_random_seed
 from src.validate.validate import validate
 
 
@@ -17,7 +17,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description='Deep learning template project')
     # 配置文件
     parser.add_argument('-cfg', default='./configs/default.yaml',
-                        help='path to config file')
+                        metavar='<path/to/cfg>', help='path to config file')
     # 可选参数
     parser.add_argument('-train', dest='train_model', action='store_true', default=False,
                         help='train model')
@@ -25,6 +25,8 @@ def parse_args():
                         help='validate model')
     parser.add_argument('-test', dest='test_model', action='store_true', default=False,
                         help='test model')
+    parser.add_argument('-resume', metavar='<ckpt_filename>',
+                        help='resume from checkpoint')
     # parser.add_argument('-wandb', action='store_true', default=False,
     #                     help='use wandb')
     # 在此添加更多命令行参数
