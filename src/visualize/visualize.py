@@ -17,6 +17,8 @@ def plot(x, y, xlabel, ylabel, image_filename):
     plt.plot(x, y)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
+    title = image_filename.rsplit('.', 1)[0]
+    plt.title(title)
     # 避免折线贴边，使图像美观
     plt.xlim([x[0] - 2, x[-1] + 2])
     plt.savefig(get_output_path(filename=image_filename, filetype='result'))

@@ -17,6 +17,9 @@ def validate_one_epoch(model, val_loader, criterion, device):
     :param device: 验证设备
     :return: 模型输出，预测结果，预测标签，平均损失
     """
+    # 设置模型为评估模式
+    model.eval()
+
     # 存储每个batch的loss
     loss_history = []
 
@@ -61,4 +64,6 @@ def validate_one_epoch(model, val_loader, criterion, device):
     res = np.concatenate(res_list)
     label = np.concatenate(label_list)
     avg_loss = np.mean(loss_history)
+    # 改回训练模式
+    model.train()
     return out, res, label, avg_loss

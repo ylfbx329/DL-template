@@ -2,6 +2,7 @@
 
 device: "cuda:0"
 seed: 1
+#resume: "epoch4.pth" # 断点续训使用的检查点，从头训练时删除
 
 data:
   root: "data/raw"
@@ -20,14 +21,14 @@ optim:
 
 sched: # [可选]调度器设置
   name: "CosineAnnealingLR" # 学习率调度器的类名
-  T_max: 5 # 学习率调度器参数，必须严格符合其构造函数声明
+  T_max: 3 # 学习率调度器参数，必须严格符合其构造函数声明
 
 train:
-  epochs: 5
+  epochs: 3
   batch_size: 256
   log_iter: 0 # 一个epoch内打印日志的频率，不需要时设置为零
   val_start: 2 # 开始验证的epoch，用于跳过对训练初期模型的不必要验证
-  val_epoch: 2 # 使用验证集验证模型的频率
+  val_epoch: 3 # 使用验证集验证模型的频率
   save_epoch: 5 # 保存ckpt的频率
 
 val:

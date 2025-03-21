@@ -17,6 +17,9 @@ def test_one_epoch(model, test_loader, criterion, device):
     :param device: 测试设备
     :return: 模型输出，预测结果，预测标签，平均损失
     """
+    # 设置模型为评估模式
+    model.eval()
+
     # 存储每个batch的loss
     loss_history = []
 

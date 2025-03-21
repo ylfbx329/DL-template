@@ -31,9 +31,6 @@ def validate(val_loader):
     load_ckpt(val_param.ckpt, model)
     logging.info('model and criterion create complete.')
 
-    # 设置模型为评估模式
-    model.eval()
-
     # 使用验证集验证模型性能，得到模型输出，预测结果，预测标签，平均损失
     output, result, label, loss = validate_one_epoch(model, val_loader, criterion, device)
 

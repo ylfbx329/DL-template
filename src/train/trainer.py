@@ -17,6 +17,9 @@ def train_one_epoch(epoch, model, train_loader, criterion, optimizer, device):
     :param device: 训练设备
     :return: 本轮次平均损失
     """
+    # 设置模型为训练模式
+    model.train()
+
     # 存储每个batch的loss
     loss_history = []
 

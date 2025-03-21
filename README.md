@@ -61,11 +61,11 @@
 
 1. 使用Git子模块管理参考项目
     - 克隆参考项目
-    ```shell
-    git submodule add --depth=1 <repo_url> <path/to/submodule>
-    # 以本项目举例
-    git submodule add --depth=1 https://github.com/ylfbx329/DL-template.git projects/DL-template
-    ```
+        ```shell
+        git submodule add --depth=1 <repo_url> <path/to/submodule>
+        # 以本项目举例
+        git submodule add --depth=1 https://github.com/ylfbx329/DL-template.git projects/DL-template
+        ```
     - 更新项目`git submodule update --remote --merge`
 2. 使用Git分支管理不同模型版本
     - 新建分支`git checkout -b new_net`

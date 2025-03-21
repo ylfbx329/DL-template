@@ -35,11 +35,8 @@ def train(train_loader, val_loader):
 
     # 断点续训
     if Config.args.resume is not None:
-        load_ckpt(train_param.ckpt, model, optimizer, scheduler)
+        load_ckpt(Config.args.resume, model, optimizer, scheduler)
     logging.info('model, criterion, optimizer and scheduler create complete.')
-
-    # 设置模型为训练模式
-    model.train()
 
     # 打印模型结构及参数
     # 此处next(iter(train_loader))并不会干扰第一个epoch的迭代，即第一个epoch仍会完整的处理整个数据集
@@ -55,9 +52,9 @@ def train(train_loader, val_loader):
     best_val_acc = -np.inf
 
     # 训练模型
-    start_epoch = scheduler.last_epoch + 1  # 便于调用
+    start_epoch = scheduler.last_epoch + 1  # 便于调用，从头训练时start_epoch=1
     total_epochs = train_param.epochs  # 便于调用
-    for epoch in range(start_epoch, total_epochs):
+    for epoch in range(start_epoch, total_epochs + 1):
         # 训练一个epoch，获取epoch平均loss
         epoch_loss = train_one_epoch(epoch, model, train_loader, criterion, optimizer, device)
         epoch_losses.append(epoch_loss)
@@ -70,7 +67,7 @@ def train(train_loader, val_loader):
         logging.info(f'Epoch [{epoch}/{total_epochs}]: lr: {epoch_lr[-1]}, Loss: {epoch_loss}')
 
         # 在设定的轮数和训练结束时保存ckpt
-        if epoch % train_param.save_epoch == 0 or epoch == total_epochs - 1:
+        if epoch % train_param.save_epoch == 0 or epoch == total_epochs:
             ckpt_filename = f'epoch{epoch}.pth'
             save_ckpt(ckpt_filename, model, optimizer, scheduler, epoch, epoch_loss)
 
@@ -88,13 +85,9 @@ def train(train_loader, val_loader):
                 logging.info(f'Validate: Epoch: {epoch}, Best Accuracy: {val_acc}')
                 save_ckpt('best_val.pth', model, optimizer, scheduler, epoch, epoch_loss)
 
-        # 启用wandb时记录日志
-        # if Config.args.wandb:
-        #     wandb.log({"epoch loss": epoch_loss})
-
     # epoch-loss图像，可自定义
     if len(epoch_losses) != 0:
-        plot(x=range(start_epoch, total_epochs),
+        plot(x=range(start_epoch, total_epochs + 1),
              y=epoch_losses,
              xlabel='Epoch',
              ylabel='Loss',
@@ -102,7 +95,7 @@ def train(train_loader, val_loader):
 
     # epoch-lr图像，可自定义
     if len(epoch_lr) != 0:
-        plot(x=range(start_epoch, total_epochs),
+        plot(x=range(start_epoch, total_epochs + 1),
              y=epoch_lr,
              xlabel='Epoch',
              ylabel='Learning Rate',
