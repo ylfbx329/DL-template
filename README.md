@@ -5,11 +5,12 @@
 ## 功能特性
 
 - 通用模板：实现了**数据加载 -> 模型创建 -> 训练优化 -> 模型验证 -> 模型测试**完整流程
+- 配置为王：仅修改YAML配置文件即可控制模型、损失函数、优化器和调度器的所有参数，无需改动代码
+- 实验管理：通过集成`BaseExp`类，快速开发预训练、对比实验等相似实验逻辑
+- 实验隔离：通过YAML配置文件控制不同实验结果的隔离，高效对比实验结果
 - 新手友好：包含大量详细注释，便于新手理解并创建自己的深度学习程序
-- 超参管理：通过YAML文件统一结构化管理超参，使用Config类一次创建，到处获取
+- 随处访问：将命令行参数和YAML配置文件统一封装到Config类，可在任意位置获取任一参数，一次创建，随处获取
 - 日志管理：详细的Python原生日志记录，在文件和控制台中同步输出日志信息
-- 无感调度：实现了无感的调度器逻辑，方便新手默认和老手自定义
-- 对比实验：通过YAML配置文件控制不同实验结果的隔离，高效对比实验结果
 
 ## 未来开发计划
 
@@ -32,6 +33,8 @@
 
 ## 使用说明
 
+### 运行实验
+
 1. 创建conda环境：根据项目需求，修改`environment.yml`环境配置文件，并创建环境
     ```shell
     conda env create -f environment.yml
@@ -40,7 +43,16 @@
     ```shell
     conda env update --file environment.yml --prune
     ```
-2. 参考`configs/default.yaml`，根据项目需要，在`configs`下创建自己的配置文件（e.g., `configs/mnist.yaml`，则`mnist`被设置为实验名（`<exp_name>`））
+2. 适配开发
+    - 配置文件：参考`configs/default.yaml`，根据项目需要，在`configs`下创建自己的配置文件（e.g., `configs/mnist.yaml`，则`mnist`被设置为实验名（`<exp_name>`））
+    - 数据
+        - 在`src/data/data_loader.py`中实现数据加载函数，返回dataloader
+        - 在`src/data/dataset.py`中实现数据集类
+    - 模型：在`src/models/net.py`中实现主模型
+    - 损失函数：在`src/criterion/criterion.py`中实现自定义的损失函数
+    - 实验：继承`src/exp/base_exp.py`中的`BaseExp`类，实现自定义的模型等构建逻辑，以及训练、验证和测试逻辑。可便捷实现预训练、对比实验等实验逻辑
+    - 评价指标：在`src/metrics/metrics.py`添加所需评价指标的计算
+    - 可视化：在`src/visualize/visualize.py`添加所需的可视化函数
 3. 命令行启动参数解释
     - `-cfg <path/to/cfg>`指定本次实验使用的配置文件
     - `-train`、`-val`和`test`运行训练、验证和测试任务，可同时指定，将按照训练-验证-测试的顺序依次执行
@@ -102,26 +114,20 @@ DL-template                 # 项目根目录
 ├── script                  # Shell脚本文件夹
 ├── src                     # 源代码文件夹
 │   ├── config              # 配置
-│   │   └── config.py       # 全局配置
+│   │   └── config.py       # 配置类
 │   ├── data                # 数据
-│   │   ├── dataset.py      # 数据集
-│   │   └── data_loader.py  # 数据加载器
+│   │   ├── utils.py        # 数据工具
+│   │   ├── dataset.py      # 实现数据集类
+│   │   └── data_loader.py  # 实现数据加载函数
 │   ├── models              # 模型
-│   │   └── net.py          # 主模型
+│   │   └── net.py          # 实现主模型
 │   ├── criterion           # 损失函数
-│   │   └── criterion.py
-│   ├── optim               # 优化器和调度器
-│   │   └── optim.py
-│   ├── train               # 训练
-│   │   ├── train.py        # 训练主脚本
-│   │   └── trainer.py      # 单轮训练
-│   ├── validate            # 验证
-│   │   ├── validate.py     # 验证主脚本
-│   │   └── validator.py    # 单轮验证
-│   ├── test                # 测试
-│   │   ├── test.py         # 测试主脚本
-│   │   └── tester.py       # 单轮测试
-│   ├── metrics             # 评估指标
+│   │   └── criterion.py    # 实现自定义损失函数
+│   ├── exp                 # 实验逻辑
+│   │   ├── base_exp.py     # 基础通用实验逻辑
+│   │   ├── <custom_exp.py> # 预训练、对比方法等自定义实验逻辑
+│   │   └── ...
+│   ├── metrics             # 评价指标
 │   │   └── metrics.py
 │   ├── visualize           # 可视化
 │   │   └── visualize.py

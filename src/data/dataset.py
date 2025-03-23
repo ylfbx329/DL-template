@@ -10,7 +10,7 @@ class MyDataSet(Dataset):
         """
         根据索引返回<样本，标签>对，可同时对数据进行变换
         :param index: 索引
-        :return: 样本和标签
+        :return: <样本，标签>
         """
         pass
 

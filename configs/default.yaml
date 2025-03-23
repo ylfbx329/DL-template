@@ -34,9 +34,9 @@ train:
 val:
   batch_size: 256
   log_iter: 0
-  ckpt: "epoch4.pth" # 用于验证的ckpt
+  ckpt: "best_val.pth" # 用于验证的ckpt
 
 test:
   batch_size: 256
   log_iter: 0
-  ckpt: "epoch4.pth" # 用于测试的ckpt
+  ckpt: "best_val.pth" # 用于测试的ckpt

@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from matplotlib import pyplot as plt
 
 from src.utils.utils import get_output_path
@@ -17,7 +19,7 @@ def plot(x, y, xlabel, ylabel, image_filename):
     plt.plot(x, y)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
-    title = image_filename.rsplit('.', 1)[0]
+    title = Path(image_filename).stem
     plt.title(title)
     # 避免折线贴边，使图像美观
     plt.xlim([x[0] - 2, x[-1] + 2])

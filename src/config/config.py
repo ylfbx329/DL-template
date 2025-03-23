@@ -1,5 +1,6 @@
 import logging
 import pprint
+from pathlib import Path
 from types import SimpleNamespace
 from typing import Dict, List, Union
 
@@ -10,8 +11,8 @@ class Config:
     """
     args = SimpleNamespace()
 
-    @staticmethod
-    def update_args(new_args: Union[Dict, List[Dict]], src_namespace: SimpleNamespace = args):
+    @classmethod
+    def update_args(cls, new_args: Union[Dict, List[Dict]], src_namespace: SimpleNamespace = None):
         """
         更新Config.args
         :param new_args: 参数字典
@@ -34,23 +35,29 @@ class Config:
 
         if isinstance(new_args, dict):
             new_args = [new_args]
+        if src_namespace is None:
+            src_namespace = cls.args
         for param_dict in new_args:
             _recursive_update(src_namespace, param_dict)
 
-    @staticmethod
-    def get_argsdict(namespace: SimpleNamespace = args) -> Dict:
+    @classmethod
+    def get_argsdict(cls, namespace: SimpleNamespace = None) -> Dict:
         """
         将namespace递归解析为字典
         :param namespace: 待解析的namespace
         :return: 解析出的参数字典
         """
-        return {key: Config.get_argsdict(value) if isinstance(value, SimpleNamespace) else value
+        if namespace is None:
+            namespace = cls.args
+        return {key: cls.get_argsdict(value) if isinstance(value, SimpleNamespace) else value
                 for key, value in vars(namespace).items()}
 
-    @staticmethod
-    def logging_args():
+    @classmethod
+    def logging_args(cls):
         """
         整齐打印Config.args为日志
         """
-        args_str = pprint.pformat(Config.get_argsdict())
+        # 单独处理Path类，将其转换为字符串，避免打印多余内容
+        args_str = pprint.pformat({key: str(value) if isinstance(value, Path) else value
+                                   for key, value in cls.get_argsdict().items()})
         logging.info(args_str)

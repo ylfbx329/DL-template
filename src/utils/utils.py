@@ -1,6 +1,7 @@
 import logging
 import os
 import random
+from pathlib import Path
 
 import numpy as np
 import torch
@@ -15,7 +16,7 @@ from src.config.config import Config
 def read_cfg(cfg_path):
     """
     读取YAML格式的配置文件，返回字典
-    :param cfg_path: 配置文件完整路径
+    :param cfg_path: 配置文件路径
     :return: 参数字典
     """
     with open(cfg_path, 'r', encoding='utf-8') as file:
@@ -23,29 +24,13 @@ def read_cfg(cfg_path):
     return cfg
 
 
-# def wandb_init():
-#     """
-#     初始化WandB
-#     """
-#     wandb.login()
-#
-#     project = os.path.basename(Config.args.proj_root)
-#     argsdict = Config.get_argsdict()
-#     exp_path = get_exp_path()
-#     wandb.init(
-#         project=project,
-#         name=Config.args.exp_name,
-#         config=argsdict,
-#         dir=exp_path
-#     )
-
-
 def logging_init(log_filename=None,
                  level=logging.INFO,
                  mode='a'):
     """
-    初始化日志模块
-    :param log_filename: 日志文件名，默认为配置文件名_运行模式
+    初始化logging模块。
+    设置日志文件路径、日志级别，日志消息样式、输出流（控制台与日志文件同时输出）
+    :param log_filename: 日志文件名，默认为”配置文件名_运行模式.log“
     :param level: 日志级别，默认为INFO
     :param mode: 写入模式，默认为追加
     """
@@ -76,16 +61,8 @@ def fix_random_seed(seed):
     torch.manual_seed(seed)
     torch.cuda.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
-
-
-def get_exp_path() -> str:
-    """
-    获取实验输出目录的绝对路径
-    :return: 实验输出目录的绝对路径
-    """
-    # 拼装实验输出目录
-    exp_path = os.path.join(Config.args.proj_root, 'outputs', Config.args.exp_name)
-    return str(exp_path)
+    torch.backends.cudnn.benchmark = False  # 禁用cuDNN基准测试
+    torch.backends.cudnn.deterministic = True  # 强制使用确定性卷积算法
 
 
 def get_output_path(filename, filetype):
@@ -96,8 +73,8 @@ def get_output_path(filename, filetype):
     :return: 输出文件的绝对路径
     """
     assert filetype in ['checkpoint', 'log', 'result'], f'filetype must be in ["checkpoint", "log", "result"], but got {filetype}'
-    path = os.path.join(get_exp_path(), filetype, filename)
-    os.makedirs(os.path.dirname(path), exist_ok=True)
+    path = Path(Config.args.output_path, filetype, filename)
+    os.makedirs(path.parent, exist_ok=True)
     return path
 
 
@@ -142,7 +119,7 @@ def load_ckpt(ckpt_filename: str,
     :param scheduler: 调度器对象，仅用于训练阶段
     """
     path = get_output_path(ckpt_filename, filetype='checkpoint')
-    assert os.path.exists(path), f'checkpoint: {path} not exist!'
+    assert path.exists(), f'checkpoint: {path} not exist!'
     # 指定map_location='cpu'避免显存占用，显示指定weights_only以兼容后续pytorch版本
     checkpoint = torch.load(path, map_location='cpu', weights_only=False)
     model.load_state_dict(checkpoint['model'])
